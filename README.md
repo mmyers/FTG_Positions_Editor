@@ -7,4 +7,4 @@ This program runs on an installation of either For the Glory or Europa Universal
 
 This is very useful for map modders. Most players and even most modders will never need this tool.
 
-This tool is a work in progress, based on code from before For the Glory existed. As of the initial GitHub checkin, this tool supports read/write province.csv for EU2 and read provinces.txt for FTG. Saving provinces.txt is  not yet implemented.
+This tool is a work in progress, based on code from before For the Glory existed. Reading and writing province sprite positions is now fully supported in both EU2 and FTG, but bugs are likely. Always back up important game files.
