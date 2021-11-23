@@ -198,7 +198,7 @@ public class MainFrame extends javax.swing.JFrame {
                 return;
             EditorDialog dialog = new EditorDialog(this, mapPanel.createImage(id), mapPanel.getProvince(id));
             dialog.setVisible(true);
-            if (dialog.getHasChanges()) {
+            if (dialog.hasChanges()) {
                 unsavedChanges = true;
                 mapPanel.repaint();
             }
@@ -232,7 +232,7 @@ public class MainFrame extends javax.swing.JFrame {
                 if (chooser.getSelectedFile().getName().endsWith(".csv")) {
                     mapPanel.getIdTbl().getProvinceData().saveCsv(chooser.getSelectedFile().getAbsolutePath());
                 } else {
-                    
+                    mapPanel.getIdTbl().getProvinceData().saveTxt(chooser.getSelectedFile().getAbsolutePath());
                 }
             } else {
                 return;

@@ -37,21 +37,20 @@ public class EditorDialog extends javax.swing.JDialog {
     }
     
     private void initFields() {
-        int id = image.getProvId();
-        setPositionFields(province.getCityPos(), cityXField, cityYField);
-        setPositionFields(province.getArmyPos(), armyXField, armyYField);
-        setPositionFields(province.getPortPos(), portXField, portYField);
-        setPositionFields(province.getManuPos(), manuXField, manuYField);
+        setPositionFields(province.getSpritePos(ProvinceData.GfxType.CITY), cityXField, cityYField);
+        setPositionFields(province.getSpritePos(ProvinceData.GfxType.ARMY), armyXField, armyYField);
+        setPositionFields(province.getSpritePos(ProvinceData.GfxType.PORT), portXField, portYField);
+        setPositionFields(province.getSpritePos(ProvinceData.GfxType.MANU), manuXField, manuYField);
         
-        setPositionFields(province.getTerrain1Pos(), terrain1XField, terrain1YField);
-        setPositionFields(province.getTerrain2Pos(), terrain2XField, terrain2YField);
-        setPositionFields(province.getTerrain3Pos(), terrain3XField, terrain3YField);
-        setPositionFields(province.getTerrain4Pos(), terrain4XField, terrain4YField);
+        setPositionFields(province.getSpritePos(ProvinceData.GfxType.TERRAIN_1), terrain1XField, terrain1YField);
+        setPositionFields(province.getSpritePos(ProvinceData.GfxType.TERRAIN_2), terrain2XField, terrain2YField);
+        setPositionFields(province.getSpritePos(ProvinceData.GfxType.TERRAIN_3), terrain3XField, terrain3YField);
+        setPositionFields(province.getSpritePos(ProvinceData.GfxType.TERRAIN_4), terrain4XField, terrain4YField);
         
-        terrain1TypeField.setText(province.getTerrain1Type());
-        terrain2TypeField.setText(province.getTerrain2Type());
-        terrain3TypeField.setText(province.getTerrain3Type());
-        terrain4TypeField.setText(province.getTerrain4Type());
+        terrain1TypeField.setText(province.getTerrainVariant(ProvinceData.TerrainVariantType.TERRAIN_1_TYPE));
+        terrain2TypeField.setText(province.getTerrainVariant(ProvinceData.TerrainVariantType.TERRAIN_2_TYPE));
+        terrain3TypeField.setText(province.getTerrainVariant(ProvinceData.TerrainVariantType.TERRAIN_3_TYPE));
+        terrain4TypeField.setText(province.getTerrainVariant(ProvinceData.TerrainVariantType.TERRAIN_4_TYPE));
     }
     
     private void setPositionFields(Point p, JTextField xField, JTextField yField) {
@@ -448,16 +447,7 @@ public class EditorDialog extends javax.swing.JDialog {
     private class FormListener implements java.awt.event.ActionListener, java.awt.event.MouseMotionListener, java.awt.event.WindowListener {
         FormListener() {}
         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            if (evt.getSource() == updateButton) {
-                EditorDialog.this.updateButtonActionPerformed(evt);
-            }
-            else if (evt.getSource() == okButton) {
-                EditorDialog.this.okButtonActionPerformed(evt);
-            }
-            else if (evt.getSource() == cancelButton) {
-                EditorDialog.this.cancelButtonActionPerformed(evt);
-            }
-            else if (evt.getSource() == cityPositionButton) {
+            if (evt.getSource() == cityPositionButton) {
                 EditorDialog.this.cityPositionButtonActionPerformed(evt);
             }
             else if (evt.getSource() == armyPositionButton) {
@@ -483,6 +473,15 @@ public class EditorDialog extends javax.swing.JDialog {
             }
             else if (evt.getSource() == gridToggleButton) {
                 EditorDialog.this.gridToggleButtonActionPerformed(evt);
+            }
+            else if (evt.getSource() == updateButton) {
+                EditorDialog.this.updateButtonActionPerformed(evt);
+            }
+            else if (evt.getSource() == okButton) {
+                EditorDialog.this.okButtonActionPerformed(evt);
+            }
+            else if (evt.getSource() == cancelButton) {
+                EditorDialog.this.cancelButtonActionPerformed(evt);
             }
         }
 
@@ -527,44 +526,50 @@ public class EditorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_provincePanelMouseMoved
 
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
-        /*setPositionIfPossible(province, ProvinceData.Province.CITY_IDX, cityXField, cityYField);
-        setPositionIfPossible(province, ProvinceData.Province.ARMY_IDX, armyXField, armyYField);
-        setPositionIfPossible(province, ProvinceData.Province.PORT_IDX, portXField, portYField);
-        setPositionIfPossible(province, ProvinceData.Province.MANU_IDX, manuXField, manuYField);
+        setPositionIfPossible(province, ProvinceData.GfxType.CITY, cityXField, cityYField);
+        setPositionIfPossible(province, ProvinceData.GfxType.ARMY, armyXField, armyYField);
+        setPositionIfPossible(province, ProvinceData.GfxType.PORT, portXField, portYField);
+        setPositionIfPossible(province, ProvinceData.GfxType.MANU, manuXField, manuYField);
         
-        setPositionIfPossible(province, ProvinceData.Province.TERRAIN_1_IDX, terrain1XField, terrain1YField);
-        setPositionIfPossible(province, ProvinceData.Province.TERRAIN_2_IDX, terrain2XField, terrain2YField);
-        setPositionIfPossible(province, ProvinceData.Province.TERRAIN_3_IDX, terrain3XField, terrain3YField);
-        setPositionIfPossible(province, ProvinceData.Province.TERRAIN_4_IDX, terrain4XField, terrain4YField);
+        setPositionIfPossible(province, ProvinceData.GfxType.TERRAIN_1, terrain1XField, terrain1YField);
+        setPositionIfPossible(province, ProvinceData.GfxType.TERRAIN_2, terrain2XField, terrain2YField);
+        setPositionIfPossible(province, ProvinceData.GfxType.TERRAIN_3, terrain3XField, terrain3YField);
+        setPositionIfPossible(province, ProvinceData.GfxType.TERRAIN_4, terrain4XField, terrain4YField);
         
-        setIntIfPossible(province, ProvinceData.Province.TERRAIN_1_TYPE_IDX, terrain1TypeField);
-        setIntIfPossible(province, ProvinceData.Province.TERRAIN_2_TYPE_IDX, terrain2TypeField);
-        setIntIfPossible(province, ProvinceData.Province.TERRAIN_3_TYPE_IDX, terrain3TypeField);
-        setIntIfPossible(province, ProvinceData.Province.TERRAIN_4_TYPE_IDX, terrain4TypeField);*/
+        setIntIfPossible(province, ProvinceData.TerrainVariantType.TERRAIN_1_TYPE, terrain1TypeField);
+        setIntIfPossible(province, ProvinceData.TerrainVariantType.TERRAIN_2_TYPE, terrain2TypeField);
+        setIntIfPossible(province, ProvinceData.TerrainVariantType.TERRAIN_3_TYPE, terrain3TypeField);
+        setIntIfPossible(province, ProvinceData.TerrainVariantType.TERRAIN_4_TYPE, terrain4TypeField);
         
         provincePanel.setProvince(province);
         provincePanel.repaint();
     }//GEN-LAST:event_updateButtonActionPerformed
     
-    private static final void setPositionIfPossible(ProvinceData.Province prov, int index, JTextField xField, JTextField yField) {
+    private static void setPositionIfPossible(ProvinceData.Province prov, ProvinceData.GfxType type, JTextField xField, JTextField yField) {
+        Point p = getPoint(xField, yField);
+        if (p != null) {
+            prov.setSpritePos(type, p);
+        }
+    }
+
+    private static Point getPoint(JTextField xField, JTextField yField) {
         if (! "".equals(xField.getText()) && ! "".equals(yField.getText())) {
             try {
                 int x = Integer.parseInt(xField.getText());
                 int y = Integer.parseInt(yField.getText());
-                //prov.setPos(index, new Point(x, y));
-
+                return new Point(x, y);
             } catch (NumberFormatException ex) {
                 System.err.println("Invalid coordinate: " + xField.getText() + " or " + yField.getText());
             }
         }
+        return null;
     }
     
-    private static final void setIntIfPossible(ProvinceData.Province prov, int index, JTextField field) {
+    private static void setIntIfPossible(ProvinceData.Province prov, ProvinceData.TerrainVariantType type, JTextField field) {
         if (! "".equals(field.getText())) {
             try {
                 int i = Integer.parseInt(field.getText());
-                //prov.setInt(index, i);
-
+                prov.setTerrainVariant(type, i);
             } catch (NumberFormatException ex) {
                 System.err.println("Invalid integer: " + field.getText());
             }
@@ -655,7 +660,7 @@ public class EditorDialog extends javax.swing.JDialog {
         provincePanel.addMouseListener(listener);
     }
 
-    public boolean getHasChanges() {
+    public boolean hasChanges() {
         return hasChanges;
     }
     

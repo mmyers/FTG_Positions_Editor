@@ -50,6 +50,7 @@ public class ProvincePanel extends javax.swing.JPanel {
     
     private Color textColor;
     private boolean drawGridLines = true;
+    private int gridSize = 10;
     
     /** Creates new form ProvincePanel */
     public ProvincePanel() {
@@ -99,14 +100,14 @@ public class ProvincePanel extends javax.swing.JPanel {
             // draw icons
             if (province != null) {
 //                int id = image.getProvId();
-                drawPointIfPossible(province.getCityPos(), g2d, "City", CITY_COLOR);
-                drawPointIfPossible(province.getArmyPos(), g2d, "Army", ARMY_COLOR);
-                drawPointIfPossible(province.getPortPos(), g2d, "Port", PORT_COLOR);
-                drawPointIfPossible(province.getManuPos(), g2d, "Manufactory", MANU_COLOR);
-                drawPointIfPossible(province.getTerrain1Pos(), g2d, "Terrain 1 (" + province.getTerrain1Type() + ")", TERRAIN_COLOR);
-                drawPointIfPossible(province.getTerrain2Pos(), g2d, "Terrain 2 (" + province.getTerrain2Type() + ")", TERRAIN_COLOR);
-                drawPointIfPossible(province.getTerrain3Pos(), g2d, "Terrain 3 (" + province.getTerrain3Type() + ")", TERRAIN_COLOR);
-                drawPointIfPossible(province.getTerrain4Pos(), g2d, "Terrain 4 (" + province.getTerrain4Type() + ")", TERRAIN_COLOR);
+                drawPointIfPossible(province.getSpritePos(ProvinceData.GfxType.CITY), g2d, "City", CITY_COLOR);
+                drawPointIfPossible(province.getSpritePos(ProvinceData.GfxType.ARMY), g2d, "Army", ARMY_COLOR);
+                drawPointIfPossible(province.getSpritePos(ProvinceData.GfxType.PORT), g2d, "Port", PORT_COLOR);
+                drawPointIfPossible(province.getSpritePos(ProvinceData.GfxType.MANU), g2d, "Manufactory", MANU_COLOR);
+                drawPointIfPossible(province.getSpritePos(ProvinceData.GfxType.TERRAIN_1), g2d, "Terrain 1 (" + province.getTerrainVariant(ProvinceData.TerrainVariantType.TERRAIN_1_TYPE) + ")", TERRAIN_COLOR);
+                drawPointIfPossible(province.getSpritePos(ProvinceData.GfxType.TERRAIN_2), g2d, "Terrain 2 (" + province.getTerrainVariant(ProvinceData.TerrainVariantType.TERRAIN_2_TYPE) + ")", TERRAIN_COLOR);
+                drawPointIfPossible(province.getSpritePos(ProvinceData.GfxType.TERRAIN_3), g2d, "Terrain 3 (" + province.getTerrainVariant(ProvinceData.TerrainVariantType.TERRAIN_3_TYPE) + ")", TERRAIN_COLOR);
+                drawPointIfPossible(province.getSpritePos(ProvinceData.GfxType.TERRAIN_4), g2d, "Terrain 4 (" + province.getTerrainVariant(ProvinceData.TerrainVariantType.TERRAIN_4_TYPE) + ")", TERRAIN_COLOR);
             }
             
             if (drawGridLines)
@@ -128,12 +129,15 @@ public class ProvincePanel extends javax.swing.JPanel {
         if (p != null) {
             float x = translateX(p.x);
             float y = translateY(p.y);
-            g.drawString(text, x+3, y-3);
             
+            // draw 7-pixel circle centered on the point
             Paint old = g.getPaint();
             g.setColor(color);
             g.fillOval((int) x-3, (int) y-3, 7, 7);
             g.setPaint(old);
+            
+            // move text slightly up and right to make room for the circle
+            g.drawString(text, x+3, y-3);
         }
     }
     
@@ -141,7 +145,7 @@ public class ProvincePanel extends javax.swing.JPanel {
     private void drawGridLines(Graphics2D g) {
 //        int width = (int) (getWidth() * ourScale);
 //        int height = (int) (getHeight() * ourScale);
-        double increment = (10.0*ourScale);
+        double increment = (gridSize*ourScale);
         
         int startX = image.getImageBounds().x;
         while (true) {

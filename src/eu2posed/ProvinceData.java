@@ -8,6 +8,7 @@ package eu2posed;
 
 import eug.parser.EUGFileIO;
 import eug.shared.GenericObject;
+import eug.shared.Style;
 import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -36,6 +37,8 @@ public class ProvinceData {
     private static final Pattern SEMICOLON = Pattern.compile(";");
     
     private String headerString;
+    
+    private GenericObject provincesObj; // if FTG-style provinces.txt rather than CSV
     
     public ProvinceData(String filename) {
         if (filename.endsWith(".csv"))
@@ -90,9 +93,9 @@ public class ProvinceData {
     }
     
     private void loadTxt(String filename) {
-        GenericObject provinces = EUGFileIO.load(filename);
+        provincesObj = EUGFileIO.load(filename);
         
-        for (GenericObject prov : provinces.getChildren("province")) {
+        for (GenericObject prov : provincesObj.getChildren("province")) {
             String idStr = prov.getString("id");
             int id = Integer.parseInt(idStr);
             allProvs.put(id, new ProvinceTxt(prov));
@@ -135,6 +138,10 @@ public class ProvinceData {
         }
     }
     
+    public void saveTxt(String filename) {
+        EUGFileIO.save(provincesObj, filename, "Edited with MichaelM's FTG Positions Editor", true, Style.AGCEEP);
+    }
+    
     public Province getProvince(int id) {
         return allProvs.get(id);
     }
@@ -160,77 +167,56 @@ public class ProvinceData {
         return p.getName();
     }
     
-//    
-//    public Point getCityPos(int id) {
-//        return allProvs[id].getCityPos();
-//    }
-//    
-//    public Point getArmyPos(int id) {
-//        return allProvs[id].getArmyPos();
-//    }
-//    
-//    public Point getPortPos(int id) {
-//        return allProvs[id].getPortPos();
-//    }
-//    
-//    public Point getManuPos(int id) {
-//        return allProvs[id].getManuPos();
-//    }
-//    
-//    public Point getTerrain1Pos(int id) {
-//        return allProvs[id].getPos(Province.TERRAIN_1_IDX);
-//    }
-//    
-//    public int getTerrain1Type(int id) {
-//        return allProvs[id].getInt(Province.TERRAIN_1_TYPE_IDX);
-//    }
-//    
-//    public Point getTerrain2Pos(int id) {
-//        return allProvs[id].getPos(Province.TERRAIN_2_IDX);
-//    }
-//    
-//    public int getTerrain2Type(int id) {
-//        return allProvs[id].getInt(Province.TERRAIN_2_TYPE_IDX);
-//    }
-//    
-//    public Point getTerrain3Pos(int id) {
-//        return allProvs[id].getPos(Province.TERRAIN_3_IDX);
-//    }
-//    
-//    public int getTerrain3Type(int id) {
-//        return allProvs[id].getInt(Province.TERRAIN_3_TYPE_IDX);
-//    }
-//    
-//    public Point getTerrain4Pos(int id) {
-//        return allProvs[id].getPos(Province.TERRAIN_4_IDX);
-//    }
-//    
-//    public int getTerrain4Type(int id) {
-//        return allProvs[id].getInt(Province.TERRAIN_4_TYPE_IDX);
-//    }
+    public enum GfxType {
+        CITY("city", 28),
+        ARMY("army", 30),
+        PORT("port", 32),
+        MANU("manufactory", 34),
+        TERRAIN_1("terrain1", 37),
+        TERRAIN_2("terrain2", 40),
+        TERRAIN_3("terrain3", 43),
+        TERRAIN_4("terrain4", 46);
+        
+        private String name; // FTG - name inside the gfx = { } block
+        private int index;   // EU2 - index into province.csv entry
+        
+        private GfxType(String name, int index) {
+            this.name = name;
+            this.index = index;
+        }
+    }
+    
+    public enum TerrainVariantType {
+        TERRAIN_1_TYPE("terrain1", 39),
+        TERRAIN_2_TYPE("terrain2", 42),
+        TERRAIN_3_TYPE("terrain3", 45),
+        TERRAIN_4_TYPE("terrain4", 48);
+        
+        private String name;
+        private int index;   // EU2 - index into province.csv entry
+        
+        private TerrainVariantType(String name, int index) {
+            this.name = name;
+            this.index = index;
+        }
+    }
     
     public interface Province {
         
         boolean isLand();
         String getName();
-        Point getCityPos();
-        Point getArmyPos();
-        Point getPortPos();
-        Point getManuPos();
-        Point getTerrain1Pos();
-        Point getTerrain2Pos();
-        Point getTerrain3Pos();
-        Point getTerrain4Pos();
-        String getTerrain1Type();
-        String getTerrain2Type();
-        String getTerrain3Type();
-        String getTerrain4Type();
+        Point getSpritePos(GfxType type);
+        String getTerrainVariant(TerrainVariantType type);
+        
+        void setSpritePos(GfxType type, Point p);
+        void setTerrainVariant(TerrainVariantType type, int value);
         
         void writeOut(BufferedWriter out) throws IOException;
     }
     
     private static class ProvinceCsv implements Province {
         private final String[] entry;
+        private final boolean isLand;
         
         public static final int NAME_IDX = 1;
         public static final int TERRAIN_IDX = 13;
@@ -250,6 +236,8 @@ public class ProvinceData {
         
         private ProvinceCsv(String[] entry) {
             this.entry = entry;
+            final int terrain = Integer.parseInt(entry[TERRAIN_IDX]);
+            isLand = (terrain != 5 && terrain != 6);
         }
         
         public String getString(int idx) {
@@ -267,68 +255,17 @@ public class ProvinceData {
         
         @Override
         public boolean isLand() {
-            final int terrain = Integer.parseInt(entry[TERRAIN_IDX]);
-            return (terrain != 5 && terrain != 6);
+            return isLand;
         }
         
         @Override
-        public Point getCityPos() {
-            return getPos(CITY_IDX);
+        public Point getSpritePos(GfxType type) {
+            return getPos(type.index);
         }
         
         @Override
-        public Point getArmyPos() {
-            return getPos(ARMY_IDX);
-        }
-        
-        @Override
-        public Point getPortPos() {
-            return getPos(PORT_IDX);
-        }
-        
-        @Override
-        public Point getManuPos() {
-            return getPos(MANU_IDX);
-        }
-
-        @Override
-        public Point getTerrain1Pos() {
-            return getPos(TERRAIN_1_IDX);
-        }
-
-        @Override
-        public Point getTerrain2Pos() {
-            return getPos(TERRAIN_2_IDX);
-        }
-
-        @Override
-        public Point getTerrain3Pos() {
-            return getPos(TERRAIN_3_IDX);
-        }
-
-        @Override
-        public Point getTerrain4Pos() {
-            return getPos(TERRAIN_4_IDX);
-        }
-
-        @Override
-        public String getTerrain1Type() {
-            return getString(TERRAIN_1_TYPE_IDX);
-        }
-
-        @Override
-        public String getTerrain2Type() {
-            return getString(TERRAIN_2_TYPE_IDX);
-        }
-
-        @Override
-        public String getTerrain3Type() {
-            return getString(TERRAIN_3_TYPE_IDX);
-        }
-
-        @Override
-        public String getTerrain4Type() {
-            return getString(TERRAIN_1_TYPE_IDX);
+        public String getTerrainVariant(TerrainVariantType type) {
+            return getString(type.index);
         }
         
         private Point getPos(int xIndex) {
@@ -339,17 +276,15 @@ public class ProvinceData {
             return null;
         }
         
-        public void setPos(int xIndex, Point pos) {
-            entry[xIndex] = Integer.toString(pos.x);
-            entry[xIndex+1] = Integer.toString(pos.y);
+        @Override
+        public void setSpritePos(GfxType type, Point pos) {
+            entry[type.index] = Integer.toString(pos.x);
+            entry[type.index+1] = Integer.toString(pos.y);
         }
         
-        private void setString(int idx, String value) {
-            entry[idx] = value;
-        }
-        
-        public void setInt(int idx, int value) {
-            entry[idx] = Integer.toString(value);
+        @Override
+        public void setTerrainVariant(TerrainVariantType type, int value) {
+            entry[type.index] = Integer.toString(value);
         }
         
         @Override
@@ -385,65 +320,15 @@ public class ProvinceData {
         public String getName() {
             return name;
         }
-
+        
         @Override
-        public Point getCityPos() {
-            return getPos("city");
+        public Point getSpritePos(GfxType type) {
+            return getPos(type.name);
         }
-
+        
         @Override
-        public Point getArmyPos() {
-            return getPos("army");
-        }
-
-        @Override
-        public Point getPortPos() {
-            return getPos("port");
-        }
-
-        @Override
-        public Point getManuPos() {
-            return getPos("manufactory");
-        }
-
-        @Override
-        public Point getTerrain1Pos() {
-            return getPos("terrain1");
-        }
-
-        @Override
-        public Point getTerrain2Pos() {
-            return getPos("terrain2");
-        }
-
-        @Override
-        public Point getTerrain3Pos() {
-            return getPos("terrain3");
-        }
-
-        @Override
-        public Point getTerrain4Pos() {
-            return getPos("terrain4");
-        }
-
-        @Override
-        public String getTerrain1Type() {
-            return getTerrainType("terrain1");
-        }
-
-        @Override
-        public String getTerrain2Type() {
-            return getTerrainType("terrain2");
-        }
-
-        @Override
-        public String getTerrain3Type() {
-            return getTerrainType("terrain3");
-        }
-
-        @Override
-        public String getTerrain4Type() {
-            return getTerrainType("terrain4");
+        public String getTerrainVariant(TerrainVariantType type) {
+            return getTerrainType(type.name);
         }
         
         private Point getPos(String name) {
@@ -467,6 +352,32 @@ public class ProvinceData {
                 }
             }
             return "";
+        }
+        
+        @Override
+        public void setSpritePos(GfxType type, Point pos) {
+            if (provGfx == null) {
+                provGfx = provObj.createChild("gfx");
+            }
+            
+            GenericObject spriteObj = provGfx.getChild(type.name);
+            if (spriteObj == null) {
+                spriteObj = provGfx.createChild(type.name);
+            }
+            spriteObj.setInt("x", pos.x);
+            spriteObj.setInt("y", pos.y);
+        }
+        
+        @Override
+        public void setTerrainVariant(TerrainVariantType type, int value) {
+            if (provGfx == null) {
+                provGfx = provObj.createChild("gfx");
+            }
+            
+            GenericObject spriteObj = provGfx.getChild(type.name);
+            if (spriteObj != null) {
+                spriteObj.setInt("variant", value);
+            }
         }
 
         @Override

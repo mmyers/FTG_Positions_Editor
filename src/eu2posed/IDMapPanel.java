@@ -104,14 +104,10 @@ public class IDMapPanel extends javax.swing.JPanel {
         for (int i = 1; i < ProvinceData.NUM_PROVINCES; i++) {
             ProvinceData.Province prov = id.getProvinceData().getProvince(i);
             if (prov != null) {
-                Point p = prov.getCityPos();
-                translateAndPaint(g, p, Color.BLUE);
-                p = prov.getArmyPos();
-                translateAndPaint(g, p, Color.RED);
-                p = prov.getPortPos();
-                translateAndPaint(g, p, Color.GREEN);
-                p = prov.getManuPos();
-                translateAndPaint(g, p, Color.BLACK);
+                translateAndPaint(g, prov.getSpritePos(ProvinceData.GfxType.CITY), Color.BLUE);
+                translateAndPaint(g, prov.getSpritePos(ProvinceData.GfxType.ARMY), Color.RED);
+                translateAndPaint(g, prov.getSpritePos(ProvinceData.GfxType.PORT), Color.GREEN);
+                translateAndPaint(g, prov.getSpritePos(ProvinceData.GfxType.MANU), Color.BLACK);
             }
         }
     }
