@@ -78,9 +78,9 @@ public class BoundboxTbl {
     public BoundboxTbl(final byte[] file) {
         this.file = ByteBuffer.wrap(file);
         this.file.order(ByteOrder.LITTLE_ENDIAN);
-        for (int i = 0; i < file.length / 4; i+=4) {
-            System.out.println(this.file.getInt(i));
-        }
+//        for (int i = 0; i < file.length / 4; i+=4) {
+//            System.out.println(this.file.getInt(i));
+//        }
     }
     
     private static byte[] readRawFile(String filename) {
@@ -115,7 +115,7 @@ public class BoundboxTbl {
         int y1 = file.getInt(index+4);
         int x2 = file.getInt(index+8);
         int y2 = file.getInt(index+12);
-        System.out.println(x1 + "," + y1 + " - " + x2 + "," + y2);
+        //System.out.println(x1 + "," + y1 + " - " + x2 + "," + y2);
         return new Rectangle(x1, y1, x2-x1, y2-y1);
     }
 }

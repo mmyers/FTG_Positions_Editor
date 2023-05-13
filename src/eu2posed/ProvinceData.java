@@ -107,8 +107,10 @@ public class ProvinceData {
         try {
             writer = new BufferedWriter(new FileWriter(filename));
             
-            writer.write(headerString);
-            writer.newLine();
+            if (headerString != null) {
+                writer.write(headerString);
+                writer.newLine();
+            }
 
             boolean writtenInvalid = false;
             int maxProv = allProvs.keySet().stream().max(Comparator.naturalOrder()).get();
@@ -177,8 +179,8 @@ public class ProvinceData {
         TERRAIN_3("terrain3", 43),
         TERRAIN_4("terrain4", 46);
         
-        private String name; // FTG - name inside the gfx = { } block
-        private int index;   // EU2 - index into province.csv entry
+        private final String name; // FTG - name inside the gfx = { } block
+        private final int index;   // EU2 - index into province.csv entry
         
         private GfxType(String name, int index) {
             this.name = name;
@@ -192,8 +194,8 @@ public class ProvinceData {
         TERRAIN_3_TYPE("terrain3", 45),
         TERRAIN_4_TYPE("terrain4", 48);
         
-        private String name;
-        private int index;   // EU2 - index into province.csv entry
+        private final String name;
+        private final int index;   // EU2 - index into province.csv entry
         
         private TerrainVariantType(String name, int index) {
             this.name = name;
@@ -298,7 +300,7 @@ public class ProvinceData {
     }
     
     private static final class ProvinceTxt implements Province {
-        private GenericObject provObj;
+        private final GenericObject provObj;
         private GenericObject provGfx; // child of provObj, but we don't want to constantly call provObj.getChild("gfx")
         private final String name;
         private final boolean isLand;
@@ -382,7 +384,7 @@ public class ProvinceData {
 
         @Override
         public void writeOut(BufferedWriter out) throws IOException {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            provObj.toFileString(out, Style.AGCEEP);
         }
         
     }
